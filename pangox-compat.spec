@@ -1,11 +1,12 @@
 Summary:	System for layout and rendering of internationalized text - X11 backend
 Name:		pangox-compat
 Version:	0.0.2
-Release:	1
+Release:	2
 License:	LGPL v2+
 Group:		X11/Libraries
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/pangox-compat/0.0/%{name}-%{version}.tar.xz
 # Source0-md5:	7bcbd0187f03e1e27af9a81e07249c33
+Patch0:		%{name}-multi-arch.patch
 URL:		http://www.pango.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -15,6 +16,14 @@ BuildRequires:	pango-devel
 BuildRequires:	pkg-config
 BuildRequires:	xorg-libX11-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%ifarch %{x8664}
+%define		march		64
+%define		_sysconfdir	/etc/pango%{march}
+%else
+%define		march		%{nil}
+%define		_sysconfdir	/etc/pango
+%endif
 
 %description
 This is a compatibility library providing the obsolete pangox library
@@ -30,6 +39,7 @@ Development files for pangox library.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %{__libtoolize}
@@ -59,7 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS ChangeLog NEWS README
 %attr(755,root,root) %ghost %{_libdir}/libpangox-1.0.so.0
 %attr(755,root,root) %{_libdir}/libpangox-1.0.so.*.*.*
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/pango/pangox.aliases
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/pangox.aliases
 
 %files devel
 %defattr(644,root,root,755)
